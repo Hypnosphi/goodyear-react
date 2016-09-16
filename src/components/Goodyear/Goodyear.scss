@@ -1,0 +1,244 @@
+$cellWidth: 25px;
+$cellHeight: 20px;
+$yearHeight: 32px;
+$padding: 5px;
+$radius: 3px;
+
+$color-text: #333;
+$color-red: #c73d05;
+$color-current: #bbdcfd;
+$color-hover: #FBEBBB;
+$color-hover-weekend: #FFDBBB;
+$color-border: #e5e5e5;
+$color-shadow: #666;
+$color-year: #c3b5b4;
+
+%hoverable {
+  cursor: pointer;
+  color: $color-text;
+  transition: color .2s ease-out 0s;
+  &:hover {
+    transition: none;
+    color: $color-red;
+  }
+}
+
+.goodyear{
+  color: $color-text;
+  position: relative;
+  display: inline-block;
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.inputContainer{
+  display: inline-block;
+  width: 180px;
+  position: relative;
+}
+
+.input{
+  outline: none;
+  border: 1px solid $color-border;
+  font-size: 14px;
+  line-height: $cellHeight;
+  padding: 2px 5px;
+  width: 100%;
+
+  &:hover{
+    border-color: color($color-border l(-10%));
+  }
+
+  &:focus,
+  &.focus{
+    border-color: $color-current;
+    box-shadow: inset 0 0 0 1px $color-current;
+  }
+}
+
+.icon{
+  @extend %hoverable;
+  position: absolute;
+  right: 5px;
+  top: 2px;
+  line-height: $cellHeight;
+}
+
+.calendar{
+  width: 320px;
+  height: 270px;
+  overflow: hidden;
+  position: absolute;
+  top: 31px;
+  left: -1px;
+  background-color: #fff;
+  box-shadow: 0 8px 20px -8px $color-shadow;
+  border-radius: 2px;
+  border: 1px solid $color-border;
+  font-size: 13px;
+  user-select: none;
+}
+
+.days{
+  position: absolute;
+  left: 3px;
+}
+
+.weekdays{
+  position: absolute;
+  z-index: 1;
+  height: $cellHeight;
+  width: 256px;
+  border-bottom: 1px solid #e5e5e5;
+  line-height: 17px;
+  top: 0;
+  left: 0;
+  padding-left: 8px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, .8);
+
+  // Bonus track for people from future and Safari lovers
+  backdrop-filter: blur(2px);
+}
+
+.weekday{
+  width: $cellWidth;
+  padding: 2px $padding 0;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.weekend {
+  color: $color-red;
+}
+
+.month{
+  line-height: $cellHeight;
+  display: flex;
+  flex-wrap: wrap;
+  width: calc($cellWidth * 7);
+  margin: calc($cellHeight / 2) $padding;
+
+  &>*{
+    padding: 0 $padding;
+    height: $cellHeight;
+    flex-shrink: 0;
+  }
+}
+
+.monthTitle{
+  flex-basis: calc($cellWidth * 3);
+  text-transform: capitalize;
+}
+
+.day{
+  text-align: right;
+  flex-basis: $cellWidth;
+  transition: background-color .2s ease-out 0s;
+  cursor: pointer;
+  border-radius: $radius;
+  position: relative;
+
+  &:hover,
+  &.parsed{
+    transition: none;
+    background-color: $color-hover;
+
+    &.weekend{
+      background-color: $color-hover-weekend;
+    }
+  }
+
+  &&.current{
+    transition: none;
+    background-color: $color-current;
+    font-weight: bold;
+    color: $color-text;
+  }
+
+  &.empty{
+    opacity: 0;
+  }
+
+  &.today::after{
+    position: absolute;
+    left: 0;
+    top: 9px;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.monthNames{
+  height: calc(12 * $cellHeight);
+  left: 195px;
+  position: absolute;
+  top: $cellHeight;
+  width: 61px;
+  padding: 0 $padding;
+  overflow: hidden;
+}
+
+.monthName{
+  @extend %hoverable;
+  height: $cellHeight;
+  line-height: $cellHeight;
+}
+
+.today::after{
+  content: ' •';
+  font-weight: bold;
+}
+
+.slider{
+  position: absolute;
+  cursor: grab;
+  z-index: 1;
+  left: 0;
+  width: 58px;
+  height: calc(2 * $cellHeight);
+  background-color: #000;
+  opacity: 0.05;
+  border-radius: $radius;
+  &:hover{
+    opacity: 0.1;
+  }
+
+  &.dragging{
+    cursor: grabbing;
+    opacity: 0.25;
+  }
+}
+
+.years{
+  position: absolute;
+  height: calc($yearHeight * 11);
+  top: 0;
+  left: 256px;
+  width: 61px;
+  border-left: 1px solid $color-border;
+}
+
+.year{
+  @extend %hoverable;
+  height: $yearHeight;
+  line-height: $yearHeight;
+  color: $color-year;
+  padding-left: 12px;
+
+  &.currentYear{
+    cursor: auto;
+    transition: none;
+    color: $color-text;
+  }
+}
+
+.marker{
+  position: absolute;
+  top: 135px;
+  left: 256px;
+  width: 61px;
+  height: 0px;
+  border-bottom: 1px solid $color-year;
+}
