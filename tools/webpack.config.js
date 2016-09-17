@@ -36,7 +36,7 @@ const GLOBALS = {
 
 const config = {
   output: {
-    publicPath: '/',
+    publicPath: '/goodyear-react/',
     sourcePrefix: '  ',
   },
 
