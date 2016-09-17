@@ -27,8 +27,6 @@ async function render(req = {}) {
     data.css = css.join('');
   });
 
-  console.log(template(data).length);
-  
   return {statusCode, html: template(data)};
 }
 

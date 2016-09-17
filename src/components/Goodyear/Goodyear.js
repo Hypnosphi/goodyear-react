@@ -10,10 +10,10 @@ import 'moment/locale/ru';
 moment.locale('ru');
 
 const initialState = {
+  text: '',
   hoverDate: null,
   scrollDate: null,
-  active: null,
-  parsedDate: null
+  active: null
 };
 
 function sameDay(next, prev) {
@@ -29,37 +29,37 @@ function sameDay(next, prev) {
 class Goodyear extends Component {
   constructor(...args) {
     super(...args);
-    this.state = initialState;
-    this.onOuterClick = e => {
-      if (!this.refs.root.contains(e.target)) {
-        this.set('active', null);
+    Object.assign(this, {
+      parsed: Object.create(null),
+      state: {
+        text: '',
+        hoverDate: null,
+        scrollDate: null,
+        active: null
+      },
+      onOuterClick: e => {
+        if (!this.refs.root.contains(e.target)) {
+          this.set('active', null);
+        }
       }
-    }
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.active && !prevState.active) {
-      window.addEventListener('click', this.onOuterClick);
-    } else if (!this.state.active && prevState.active) {
-      window.removeEventListener('click', this.onOuterClick);
+    if (this.state.active !== prevState.active) {
+      if (!prevState.active) {
+        window.addEventListener('click', this.onOuterClick);
+      } else if (!this.state.active) {
+        window.removeEventListener('click', this.onOuterClick);
+      }
+
+      this.state.text && prevState.active && this.confirm(prevState.active);
+      this.set('text', '');
     }
 
-    if (!this.props.range) {
-      if (this.props.date && !sameDay(this.props.date, prevProps.date)) this.set(initialState);
-    } else {
-      if (this.props.from && !sameDay(this.props.from, prevProps.from)) {
-        this.set({
-          active: 'to',
-          parsedDate: null
-        });
-      } else if (this.props.to && !sameDay(this.props.to, prevProps.to)) {
-        this.set(this.state.active === 'to' && this.props.from
-          ? initialState
-          : {
-            parsedDate: null,
-            active: 'from'
-          });
-      }
+    const name = this.state.active;
+    if (this.props[name] && !sameDay(this.props[name], prevProps[name])){
+      this.set('text', '');
     }
   }
 
@@ -77,34 +77,65 @@ class Goodyear extends Component {
   }
 
   select(changes) {
-    if (!this.props.range) return this.props.onChange(changes.date);
+    this.set('text', '');
+    if (!this.props.range) {
+      this.set('active', null);
+      return this.props.onChange(changes.date);
+    }
 
     let {from, to} = {
       ...this.props,
       ...changes
     };
 
+    // proceed to setting the end by default
+    let active = 'to';
+
+    // end is before beginning
     if (from && to && from.isAfter(to, 'days')) {
-      if (this.state.active === 'from') {
+      // ignore the old end when beginning is changed
+      if (changes.from) {
         to = null;
-      } else if (this.state.active === 'to') {
-        from = null;
+      // treat range as reverse when end is changed
+      } else if (changes.to) {
+        to = from;
+        from = changes.to;
       }
+    } else if (changes.to) {
+      // proceed to setting the beginning if it's absent, otherwise we're done
+      active = from ? null : 'from';
     }
 
+    this.set({
+      active,
+      hoverDate: null
+    });
     this.props.onChange({from, to});
   }
 
-  render() {
-    const extendedFormats = [
-      this.props.format,
-      ...formats
-    ];
+  parseDate(text) {
+    if (!(text in this.parsed)) {
+      const extendedFormats = [
+        this.props.format,
+        ...formats
+      ];
+      const date = moment(text, extendedFormats);
+      this.parsed[text] = date.isValid() ? date : null;
+    }
 
+    return this.parsed[text];
+  }
+
+  confirm(name) {
+    this.select({
+      [name]: this.parseDate(this.state.text) || this.props[name]
+    });
+  }
+
+  render() {
     const names = this.props.range ? ['from', 'to'] : ['date'];
     const dates = names.reduce((obj, key) => {
-      let date = this.props[key] && moment(this.props[key], extendedFormats);
-      if (date && !date.isValid()) date = null;
+      const date = this.parseDate(this.props[key]);
       return {...obj, [key]: date};
     }, {});
     return (
@@ -115,25 +146,25 @@ class Goodyear extends Component {
         {names.map(name => (
           <Input
             {...this.props}
+            {...this.state}
             key={name}
             date={dates[name]}
-            formats={extendedFormats}
             active={this.state.active === name}
-            hoverText={this.state.hoverText}
-            parsedDate={this.state.parsedDate}
             onActivate={() => this.set('active', name)}
-            onParse={date => this.set({
-              parsedDate: date,
-              scrollDate: date
-            })}
-            onConfirm={() => this.state.parsedDate && this.select({[name]: this.state.parsedDate})}
+            onInput={text => {
+              this.set({
+                text,
+                scrollDate: this.parseDate(text) || this.state.scrollDate
+              })
+            }}
+            onConfirm={() => this.confirm(name)}
           />
         ))}
         <Calendar
           {...this.props}
-          active={this.state.active}
+          {...this.state}
           scrollDate={this.state.scrollDate || dates[this.state.active] || moment()}
-          activeDate={this.state.hoverDate || this.state.parsedDate}
+          activeDate={this.state.hoverDate || this.state.text && this.parseDate(this.state.text)}
           onScroll={scrollDate => this.set({scrollDate})}
           onHover={date => this.set('hoverDate', date)}
           onSelect={date => this.select({[this.state.active]: date})}

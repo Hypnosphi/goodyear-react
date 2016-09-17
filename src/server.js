@@ -78,7 +78,7 @@ server.use('/graphql', expressGraphQL(req => ({
 // -----------------------------------------------------------------------------
 server.get('*', async (req, res, next) => {
   try {
-    const {statusCode, html} = await render(assets, req);
+    const {statusCode, html} = await render(req);
     res.status(statusCode);
     res.send(html);
   } catch (err) {

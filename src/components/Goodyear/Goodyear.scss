@@ -153,22 +153,32 @@ $color-year: #c3b5b4;
   flex-basis: $cellWidth;
   transition: background-color .2s ease-out 0s;
   cursor: pointer;
-  border-radius: $radius;
   position: relative;
+  border-radius: $radius;
 
-  &.current,
-  &.from,
-  &.to{
+
+
+  &.between{
+    border-radius: 0;
+    transition: none;
+    background-color: color($color-current l(+10%));
+  }
+
+  &.activeBetween{
+    border-radius: 0;
+    transition: none;
+    background-color: color($color-hover l(+5%));
+
+    &.weekend{
+      background-color: color($color-hover-weekend l(+5%));
+    }
+  }
+
+  &.current{
     transition: none;
     background-color: $color-current;
     font-weight: bold;
     color: $color-text;
-  }
-
-  &.between{
-    transition: none;
-    background-color: color($color-current l(+7%));
-    border-radius: 0;
   }
 
   &.active{
@@ -180,17 +190,20 @@ $color-year: #c3b5b4;
     }
   }
 
-  &.activeBetween{
-    transition: none;
-    background-color: color($color-hover l(+7%));
-    border-radius: 0;
+  &.from{
+    border-radius: $radius 0 0 $radius;
+  }
 
-    &.weekend{
-      background-color: color($color-hover-weekend l(+7%));
-    }
+  &.to{
+    border-radius: 0 $radius $radius 0;
+  }
+
+  &.from.to{
+    border-radius: $radius;
   }
 
   &.empty{
+    pointer-events: none;
     opacity: 0;
   }
 
