@@ -15,13 +15,11 @@ import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
 import expressGraphQL from 'express-graphql';
 import jwt from 'jsonwebtoken';
-import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
 import passport from './core/passport';
 import schema from './data/schema';
-import Router from './routes';
-import assets from './assets';
-import { port, auth, analytics } from './config';
+import render from './render';
+import { port, auth } from './config';
 
 const server = global.server = express();
 
@@ -80,29 +78,9 @@ server.use('/graphql', expressGraphQL(req => ({
 // -----------------------------------------------------------------------------
 server.get('*', async (req, res, next) => {
   try {
-    let statusCode = 200;
-    const template = require('./views/index.jade');
-    const data = { title: '', description: '', css: '', body: '', entry: assets.main.js };
-
-    if (process.env.NODE_ENV === 'production') {
-      data.trackingId = analytics.google.trackingId;
-    }
-
-    const css = [];
-    const context = {
-      insertCss: styles => css.push(styles._getCss()),
-      onSetTitle: value => (data.title = value),
-      onSetMeta: (key, value) => (data[key] = value),
-      onPageNotFound: () => (statusCode = 404),
-    };
-
-    await Router.dispatch({ path: req.path, query: req.query, context }, (state, component) => {
-      data.body = ReactDOM.renderToString(component);
-      data.css = css.join('');
-    });
-
+    const {statusCode, html} = await render(assets, req);
     res.status(statusCode);
-    res.send(template(data));
+    res.send(html);
   } catch (err) {
     next(err);
   }

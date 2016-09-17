@@ -104,7 +104,7 @@
     "clean": "babel-node tools/run clean",
     "copy": "babel-node tools/run copy",
     "bundle": "babel-node tools/run bundle",
-    "build": "babel-node tools/run build",
+    "build": "babel-node tools/run build && node build/server",
     "deploy": "babel-node tools/run deploy",
     "start": "babel-node tools/run start"
   }
