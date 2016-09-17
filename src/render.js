@@ -2,11 +2,18 @@ import ReactDOM from 'react-dom/server';
 import Router from './routes';
 import assets from './assets';
 import fs from 'fs';
+import path from 'path';
 
-async function render(req = {}) {
+async function render(req, prefix = '') {
   let statusCode = 200;
   const template = require('./views/index.jade');
-  const data = { title: '', description: '', css: '', body: '', entry: assets.main.js };
+  const data = {
+    title: '',
+    description: '',
+    css: '',
+    body: '',
+    entry: path.join(prefix, assets.main.js)
+  };
 
   const css = [];
   const context = {
@@ -24,7 +31,7 @@ async function render(req = {}) {
   return {statusCode, html: template(data)};
 }
 
-render().then(({html}) => fs.writeFile(
+render({}, 'build/public').then(({html}) => fs.writeFile(
   'index.html',
   html
 ));
