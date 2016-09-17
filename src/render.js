@@ -2,9 +2,8 @@ import ReactDOM from 'react-dom/server';
 import Router from './routes';
 import assets from './assets';
 import fs from 'fs';
-import path from 'path';
 
-async function render(req, prefix = '') {
+async function render(req = {}) {
   let statusCode = 200;
   const template = require('./views/index.jade');
   const data = {
@@ -12,7 +11,7 @@ async function render(req, prefix = '') {
     description: '',
     css: '',
     body: '',
-    entry: path.join(prefix, assets.main.js)
+    entry: assets.main.js
   };
 
   const css = [];
@@ -28,10 +27,12 @@ async function render(req, prefix = '') {
     data.css = css.join('');
   });
 
+  console.log(template(data).length);
+  
   return {statusCode, html: template(data)};
 }
 
-render({}, 'build/public').then(({html}) => fs.writeFile(
+render().then(({html}) => fs.writeFile(
   'index.html',
   html
 ));

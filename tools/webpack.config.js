@@ -12,7 +12,7 @@ import webpack from 'webpack';
 import extend from 'extend';
 import AssetsPlugin from 'assets-webpack-plugin';
 
-const DEBUG = !process.argv.includes('--release');
+const DEBUG = false;
 const VERBOSE = process.argv.includes('--verbose');
 const AUTOPREFIXER_BROWSERS = [
   'Android 2.3',
@@ -88,10 +88,9 @@ const config = {
         test: /\.txt$/,
         loader: 'raw-loader',
       }, {
-        test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url-loader?limit=400000',
-      },
-      {
+        test: /\.(png|jpg|jpeg|gif|svg|wav|mp3|woff|woff2|eot|ttf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'file-loader?name=resources/[name].[ext]',
+      }, {
         test: /\.jade$/,
         loader: 'jade-loader',
       },
@@ -114,8 +113,8 @@ const config = {
 const clientConfig = extend(true, {}, config, {
   entry: './src/client.js',
   output: {
-    path: path.join(__dirname, '../build/public'),
-    filename: DEBUG ? '[name].js?[hash]' : '[name].[hash].js',
+    path: path.join(__dirname, '..'),
+    filename: '[name].js?[hash]',
   },
 
   // Choose a developer tool to enhance debugging
