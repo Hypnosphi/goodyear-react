@@ -151,7 +151,7 @@ function Calendar(props) {
   return (
     <div
       className={s.calendar}
-      hidden={!props.open}
+      hidden={!props.active}
     >
       <Months {...props} />
       <Years {...props} />
@@ -160,4 +160,4 @@ function Calendar(props) {
   );
 }
 
-export default withStyles(Calendar, s);
+export default withStyles(s)(Calendar);

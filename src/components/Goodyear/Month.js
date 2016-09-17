@@ -7,8 +7,12 @@ import cx from 'classnames';
 function Day(props) {
   const {
     day,
+    range,
     date,
-    parsedDate,
+    from,
+    to,
+    active,
+    activeDate,
     empty,
     onSelect,
     onHover
@@ -17,9 +21,16 @@ function Day(props) {
     <div
       className={cx(
         s.day,
-        day.isSame(date, 'day') && s.current,
+        !range && date && day.isSame(date, 'day') && s.current,
+        range && from && day.isSame(from, 'day') && s.from,
+        range && to && day.isSame(to, 'day') && s.to,
+        range && from && to && day.isBetween(from, to, 'days') && s.between,
         day.isSame(moment(), 'day') && s.today,
-        parsedDate && day.isSame(parsedDate, 'day') && s.parsed,
+        activeDate && day.isSame(activeDate, 'day') && s.active,
+        range && activeDate && (
+          active === 'from' && to && day.isBetween(activeDate, to, 'days') ||
+          active === 'to' && from && day.isBetween(from, activeDate, 'days')
+        ) && s.activeBetween,
         day.weekday() > 4 && s.weekend,
         empty && s.empty
       )}
@@ -68,4 +79,4 @@ function Month(props) {
   );
 }
 
-export default withStyles(Month, s);
+export default withStyles(s)(Month);

@@ -10,7 +10,6 @@
 import React, { Component, PropTypes } from 'react';
 import emptyFunction from 'fbjs/lib/emptyFunction';
 import s from './App.scss';
-import Goodyear from '../Goodyear';
 
 class App extends Component {
 
@@ -32,11 +31,6 @@ class App extends Component {
     onPageNotFound: PropTypes.func.isRequired,
   };
 
-  constructor(...args) {
-    super(...args);
-    this.state = {}
-  }
-
   getChildContext() {
     const context = this.props.context;
     return {
@@ -57,14 +51,7 @@ class App extends Component {
   }
 
   render() {
-    return !this.props.error ? (
-      <div className={s.app}>
-        <Goodyear
-          date={this.state.date}
-          onChange={date => this.setState({...this.state, date})}
-        />
-      </div>
-    ) : this.props.children;
+    return this.props.children;
   }
 
 }

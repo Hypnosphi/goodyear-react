@@ -100,4 +100,4 @@ function MonthNames(props) {
   );
 }
 
-export default withStyles(MonthNames, s);
+export default withStyles(s)(MonthNames);

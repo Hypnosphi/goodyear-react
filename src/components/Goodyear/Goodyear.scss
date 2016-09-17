@@ -36,6 +36,19 @@ $color-year: #c3b5b4;
   display: inline-block;
   width: 180px;
   position: relative;
+
+  &:not(:first-child){
+    margin-left: 30px;
+    &::before{
+      position: absolute;
+      top: 0;
+      left: -22px;
+      content: '➔';
+      line-height: 24px;
+      font-size: 16px;
+      color: $color-shadow;
+    }
+  }
 }
 
 .input{
@@ -43,7 +56,7 @@ $color-year: #c3b5b4;
   border: 1px solid $color-border;
   font-size: 14px;
   line-height: $cellHeight;
-  padding: 2px 5px;
+  padding: 2px $padding;
   width: 100%;
 
   &:hover{
@@ -62,7 +75,9 @@ $color-year: #c3b5b4;
   position: absolute;
   right: 5px;
   top: 2px;
-  line-height: $cellHeight;
+  &::before {
+    line-height: $cellHeight;
+  }
 }
 
 .calendar{
@@ -70,6 +85,7 @@ $color-year: #c3b5b4;
   height: 270px;
   overflow: hidden;
   position: absolute;
+  z-index: 100;
   top: 31px;
   left: -1px;
   background-color: #fff;
@@ -140,8 +156,22 @@ $color-year: #c3b5b4;
   border-radius: $radius;
   position: relative;
 
-  &:hover,
-  &.parsed{
+  &.current,
+  &.from,
+  &.to{
+    transition: none;
+    background-color: $color-current;
+    font-weight: bold;
+    color: $color-text;
+  }
+
+  &.between{
+    transition: none;
+    background-color: color($color-current l(+7%));
+    border-radius: 0;
+  }
+
+  &.active{
     transition: none;
     background-color: $color-hover;
 
@@ -150,11 +180,14 @@ $color-year: #c3b5b4;
     }
   }
 
-  &&.current{
+  &.activeBetween{
     transition: none;
-    background-color: $color-current;
-    font-weight: bold;
-    color: $color-text;
+    background-color: color($color-hover l(+7%));
+    border-radius: 0;
+
+    &.weekend{
+      background-color: color($color-hover-weekend l(+7%));
+    }
   }
 
   &.empty{

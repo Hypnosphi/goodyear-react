@@ -20,7 +20,7 @@ import ErrorPage from './components/ErrorPage';
 
 const router = new Router(on => {
   on('*', async (state) => {
-    return <App context={state.context}></App>;
+    return <App context={state.context}><ContentPage /></App>;
   });
 
   on('error', (state, error) => state.statusCode === 404 ?

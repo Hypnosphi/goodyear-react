@@ -20,7 +20,7 @@
 html {
   color: #222;
   font-weight: 100;
-  font-size: 1em; /* ~16px; */
+  font-size: 14px;
   font-family: $font-family-base;
   line-height: 1.375; /* ~22px */
 }
@@ -87,6 +87,10 @@ fieldset {
 
 textarea {
   resize: vertical;
+}
+
+h1, h2, h3, h4{
+  font-weight: 100;
 }
 
 /*
@@ -177,5 +181,5 @@ textarea {
 }
 
 .app{
-  padding: 2em;
+  padding: 2em 5em;
 }
