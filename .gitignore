@@ -6,6 +6,3 @@ node_modules
 ncp-debug.log
 npm-debug.log
 .idea
-index.html
-main.js
-resources
