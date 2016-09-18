@@ -5,17 +5,14 @@
     "npm": ">=3.3 <4"
   },
   "dependencies": {
-    "babel-polyfill": "6.6.1",
     "babel-runtime": "6.6.1",
     "bluebird": "3.3.3",
     "classnames": "2.2.3",
     "express": "4.13.4",
-    "fastclick": "1.0.6",
     "font-awesome": "4.6.3",
     "history": "2.0.0",
     "isomorphic-style-loader": "1.0.0",
     "jade": "1.11.0",
-    "markdown-it": "6.0.0",
     "moment": "2.15.0",
     "normalize.css": "3.0.3",
     "pretty-error": "2.0.0",

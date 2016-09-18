@@ -2,7 +2,7 @@ import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
 import cx from 'classnames';
-import fa from 'isomorphic-style!css!font-awesome/css/font-awesome.css';
+import fa from 'isomorphic-style!css?minimize!font-awesome/css/font-awesome.css';
 
 function Input({
   active,
