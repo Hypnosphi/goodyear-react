@@ -5,3 +5,14 @@ export const calHeight = 270;
 export const cellHeight = 20;
 export const yearHeight = 32;
 export const yearLength = +moment.duration(1, 'year');
+
+export function linear(x0, y0, a) {
+  return {
+    Y(x) {
+      return +y0 + (x - x0) * a;
+    },
+    X(y) {
+      return  +x0 + (y - y0) / a;
+    }
+  };
+}

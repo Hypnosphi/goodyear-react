@@ -9,13 +9,6 @@ import 'moment/locale/ru';
 
 moment.locale('ru');
 
-const initialState = {
-  text: '',
-  hoverDate: null,
-  scrollDate: null,
-  active: null
-};
-
 function sameDay(next, prev) {
   const nextMoment = moment(next);
   const prevMoment = moment(prev);
@@ -49,8 +42,10 @@ class Goodyear extends Component {
     if (this.state.active !== prevState.active) {
       if (!prevState.active) {
         window.addEventListener('click', this.onOuterClick);
+        window.addEventListener('focusin', this.onOuterClick);
       } else if (!this.state.active) {
         window.removeEventListener('click', this.onOuterClick);
+        window.removeEventListener('focusin', this.onOuterClick);
       }
 
       this.state.text && prevState.active && this.confirm(prevState.active);
@@ -77,9 +72,11 @@ class Goodyear extends Component {
   }
 
   select(changes) {
-    this.set('text', '');
     if (!this.props.range) {
-      this.set('active', null);
+      this.set({
+        active: null,
+        text: ''
+      });
       return this.props.onChange(changes.date);
     }
 
@@ -108,7 +105,8 @@ class Goodyear extends Component {
 
     this.set({
       active,
-      hoverDate: null
+      hoverDate: null,
+      text: ''
     });
     this.props.onChange({from, to});
   }

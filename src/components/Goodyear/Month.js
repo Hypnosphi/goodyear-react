@@ -5,7 +5,7 @@ import s from './Goodyear.scss';
 import cx from 'classnames';
 
 
-let TO;
+let hoverTO;
 
 function Day(props) {
   const {
@@ -13,20 +13,27 @@ function Day(props) {
     range,
     from,
     to,
-    active,
     activeDate,
+    currentRange,
+    activeRange,
     empty,
     onSelect,
     onHover
   } = props;
 
-  const hoverFrom = range && activeDate && active === 'from' && to;
-  const hoverTo = range && activeDate && active === 'to' && from;
-  const reverse = hoverTo && activeDate.isBefore(from, 'days');
-
   function is(name) {
-    return props[name] && day.isSame(props[name], 'day');
+    return props[name] && isDay(props[name]);
   }
+
+  function isDay(date) {
+    return day.isSame(date, 'day');
+  }
+
+  function inRange(range) {
+    return range && day.isBetween(...range, 'days');
+  }
+
+  const reverse = activeRange && activeRange[1] === from;
 
   return (
     <div
@@ -35,26 +42,22 @@ function Day(props) {
         ['date', 'from', 'to'].some(is) && s.current,
         day.isSame(moment(), 'day') && s.today,
         is('activeDate') && s.active,
-        (is('from') && !reverse || (hoverFrom || reverse) && is('activeDate')) && s.from,
-        (is('to') || is('from') && reverse || hoverTo && !reverse && is('activeDate')) && s.to,
-        range && from && to && day.isBetween(from, to, 'days') && s.between,
-        (
-          hoverFrom && day.isBetween(activeDate, to, 'days') ||
-          reverse && from && day.isBetween(activeDate, from, 'days') ||
-          hoverTo && from && day.isBetween(from, activeDate, 'days')
-        ) && s.activeBetween,
+        (currentRange && isDay(currentRange[0]) && !reverse || activeRange && isDay(activeRange[0])) && s.from,
+        (currentRange && isDay(currentRange[1]) || activeRange && isDay(activeRange[1])) && s.to,
+        inRange(currentRange) && s.between,
+        inRange(activeRange) && s.activeBetween,
         day.weekday() > 4 && s.weekend,
         empty && s.empty
       )}
       onClick={() => onSelect(day)}
       onMouseOver={() => {
-        if (TO) {
-          window.clearTimeout(TO);
-          TO = null;
+        if (hoverTO) {
+          window.clearTimeout(hoverTO);
+          hoverTO = null;
         }
         onHover(day);
       }}
-      onMouseOut={() => TO = window.setTimeout(onHover, 0)}
+      onMouseOut={() => hoverTO = window.setTimeout(onHover, 0)}
     >
       {empty || day.format('D')}
     </div>
