@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Month from './Month';
 import MonthNames from './MonthNames';
-import {cellHeight, calHeight, yearLength, yearHeight} from './consts';
+import Years from './Years';
+import {cellHeight, calHeight, linear} from './consts';
 import moment from 'moment';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
@@ -46,9 +47,10 @@ function Weekdays() {
 
 function Months(props) {
   let scrollDate = moment(props.scrollDate);
-  let month = scrollDate
+  const monthStart = scrollDate.clone().startOf('month');
+
+  let month = monthStart
     .clone()
-    .startOf('month')
     .subtract(2, 'months');
   let months = [month];
   for (let i = 0; i < 4; i++) {
@@ -58,10 +60,10 @@ function Months(props) {
     months.push(month);
   }
 
-  const monthStart = scrollDate.clone().startOf('month');
   const currentSpeed = monthSpeed(scrollDate);
-  const offset = (scrollDate - monthStart) / currentSpeed;
-  const bottomOffset = monthHeight(scrollDate) - offset;
+  const pxToDate = linear(0, scrollDate, currentSpeed);
+  const offset = pxToDate.X(monthStart); // is a negative number
+  const bottomOffset = monthHeight(scrollDate) + offset;
 
   return (
     <div
@@ -69,22 +71,22 @@ function Months(props) {
       onWheel={e => {
         e.preventDefault();
         const dy = e.deltaY;
-        let dt;
+        let date;
         // adjust scroll speed to prevent glitches
-        if (dy < -offset) {
-          dt = -offset * currentSpeed + (dy + offset) * monthSpeed(months[1]);
+        if (dy < offset) {
+          date = pxToDate.Y(offset) + (dy - offset) * monthSpeed(months[1]);
         } else if (dy > bottomOffset) {
-          dt = bottomOffset * currentSpeed + (dy - bottomOffset) * monthSpeed(months[3]);
+          date = pxToDate.Y(bottomOffset) + (dy - bottomOffset) * monthSpeed(months[3]);
         } else {
-          dt = dy * currentSpeed;
+          date = pxToDate.Y(dy);
         }
-        props.onScroll(scrollDate + dt);
+        props.onScroll(date);
       }}
     >
       <Weekdays />
       <div
         style={{
-          top: Math.floor(calHeight / 2 - monthHeight(months[0]) - monthHeight(months[1]) - offset)
+          top: Math.floor(calHeight / 2 - monthHeight(months[0]) - monthHeight(months[1]) + offset)
         }}
         className={s.days}
       >
@@ -101,60 +103,48 @@ function Months(props) {
   );
 }
 
-function Years(props) {
-  let scrollDate = moment(props.scrollDate);
-  let year = scrollDate
-    .clone()
-    .startOf('year')
-    .subtract(5, 'years');
-  const years = [year];
-  for (let i = 0; i < 10; i++) {
-    year = year
-      .clone()
-      .add(1, 'year');
-    years.push(year);
-  }
-
-  const yearStart = scrollDate.clone().startOf('year');
-  const speed = yearLength / yearHeight;
-  const offset = (scrollDate - yearStart) / speed;
-
-  return (
-    <div
-      className={s.years}
-      onWheel={e => {
-        e.preventDefault();
-        props.onScroll(scrollDate + e.deltaY * speed);
-      }}
-      style={{
-        top: Math.floor(calHeight / 2 - 5 * yearHeight - offset)
-      }}
-    >
-      {years.map(year => (
-        <div
-          key={+year}
-          className={cx(
-            s.year,
-            year.isSame(scrollDate, 'year') && s.currentYear,
-            year.isSame(moment(), 'year') && s.today
-          )}
-          onClick={() => props.onScroll(scrollDate.year(year.year()))}
-        >
-          {year.format('YYYY')}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function Calendar(props) {
+  const {
+    range,
+    from,
+    to,
+    active,
+    activeDate
+  } = props;
+  
+  const currentRange = range && from && to && [from, to];
+  let activeRange = null;
+  if (range && activeDate) {
+    switch (active) {
+      case 'from':
+        if (to && !activeDate.isAfter(to, 'days')) {
+          activeRange = [activeDate, to];
+        }
+        break;
+      case 'to': {
+        if (!from) break;
+        if (activeDate.isBefore(from, 'days')) {
+          activeRange = [activeDate, from];
+        } else {
+          activeRange = [from, activeDate];
+        }
+      }
+    }
+  }
+  
+  const extendedProps = {
+    ...props,
+    currentRange,
+    activeRange
+  };
+
   return (
     <div
       className={s.calendar}
-      hidden={!props.active}
+      hidden={!active}
     >
-      <Months {...props} />
-      <Years {...props} />
+      <Months {...extendedProps} />
+      <Years {...extendedProps} />
       <div className={s.marker} />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import {cellHeight, yearLength} from './consts';
+import {cellHeight, yearLength, linear} from './consts';
 import moment from 'moment';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
@@ -16,9 +16,9 @@ class Slider extends Component {
       this.setState({dragging: false});
     };
 
-    this.onMouseMove = e => {
-      this.props.onScroll(this.props.scrollDate + e.movementY / (12 * cellHeight) * yearLength);
-    };
+    this.onMouseMove = e => this.props.onScroll(
+      linear(0, this.props.scrollDate, yearLength/(12 * cellHeight)).Y(e.movementY)
+    );
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -32,19 +32,28 @@ class Slider extends Component {
   }
 
   render() {
-    const sides = ['top', 'middle', 'bottom']
+    let year = moment(this.props.scrollDate)
+      .startOf('day')
+      .subtract(1, 'year');
+    const years = [year];
+    for (let i = 0; i < 2; i++) {
+      year = year
+        .clone()
+        .add(1, 'year');
+      years.push(year);
+    }
 
     return (
       <div>
-        {sides.map((side, i) => (
+        {years.map(year => (
           <div
-            key={side}
+            key={+year}
             className={cx(
               s.slider,
               this.state.dragging && s.dragging
             )}
             style={{
-                top: Math.floor(((this.props.offset + i - 1) * 12 - 1) * cellHeight)
+                top: Math.floor(this.props.pxToDate.X(year) - cellHeight)
             }}
             onMouseDown={e => {
               this.setState({dragging: true});
@@ -68,10 +77,11 @@ function MonthNames(props) {
     );
   }
 
-  const yearStart = scrollDate
-    .clone()
-    .startOf('year');
-  const offset = (scrollDate - yearStart) / yearLength;
+  const pxToDate = linear(
+    0,
+    moment(props.scrollDate).startOf('year'),
+    yearLength/(12 * cellHeight)
+  );
 
   return (
     <div className={s.monthNames}>
@@ -92,10 +102,26 @@ function MonthNames(props) {
           {month.format('MMM')}
         </div>
       ))}
-      <Slider
-        {...props}
-        offset={offset}
-      />
+      {['currentRange', 'activeRange'].map(name => {
+        const range = props[name];
+        if (!range) return;
+        const [top, bottom] = range.map(date => Math.floor(pxToDate.X(date)));
+        if (bottom - top <= 2) return;
+        return (
+          <div
+            key={name}
+            className={cx(
+              s.range,
+              s[name]
+            )}
+            style={{
+              top : top - 1,
+              height: bottom - top + 2
+            }}
+          />
+        )
+      })}
+      <Slider {...props} pxToDate={pxToDate}/>
     </div>
   );
 }
