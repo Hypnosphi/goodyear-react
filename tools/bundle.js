@@ -7,6 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+import fs from 'fs';
 import webpack from 'webpack';
 import webpackConfig from './webpack.config';
 
@@ -19,6 +20,14 @@ function bundle() {
       if (err) {
         return reject(err);
       }
+
+      process.nextTick(() => {
+        const statsJson = stats.toJson('verbose');
+        fs.writeFile(
+          'webpack-stats.json',
+          JSON.stringify(statsJson.children[0])
+        );
+      });
 
       console.log(stats.toString(webpackConfig[0].stats));
       return resolve();
