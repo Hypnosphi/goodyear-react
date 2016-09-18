@@ -8,14 +8,19 @@
  */
 
 import del from 'del';
-import fs from './lib/fs';
 
 /**
  * Cleans up the output (build) directory.
  */
 async function clean() {
-  await del(['.tmp', 'build/*', '!build/.git', 'resources/*', 'main.js', 'index.html'], { dot: true });
-  await fs.makeDir('build/public');
+  await del([
+    '.tmp',
+    'build/*',
+    '!build/.git',
+    'resources/*',
+    'main.js',
+    'index.html',
+  ], { dot: true });
 }
 
 export default clean;

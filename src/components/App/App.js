@@ -7,8 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { Component, PropTypes } from 'react';
-import emptyFunction from 'fbjs/lib/emptyFunction';
+import { Component, PropTypes } from 'react';
 import s from './App.scss';
 
 class App extends Component {
@@ -34,10 +33,10 @@ class App extends Component {
   getChildContext() {
     const context = this.props.context;
     return {
-      insertCss: context.insertCss || emptyFunction,
-      onSetTitle: context.onSetTitle || emptyFunction,
-      onSetMeta: context.onSetMeta || emptyFunction,
-      onPageNotFound: context.onPageNotFound || emptyFunction,
+      insertCss: context.insertCss || Function.prototype,
+      onSetTitle: context.onSetTitle || Function.prototype,
+      onSetMeta: context.onSetMeta || Function.prototype,
+      onPageNotFound: context.onPageNotFound || Function.prototype,
     };
   }
 

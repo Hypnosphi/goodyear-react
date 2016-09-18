@@ -1,5 +1,5 @@
-import React, { Component, PropTypes } from 'react';
-import {calHeight, yearLength, yearHeight, linear} from './consts';
+import React, { Component } from 'react';
+import { calHeight, yearLength, yearHeight, linear } from './consts';
 import moment from 'moment';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
@@ -10,9 +10,7 @@ let scrollTO;
 class Years extends Component {
   constructor(...args) {
     super(...args);
-    this.state = {
-      scrollDate: null
-    }
+    this.state = { scrollDate: null };
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -24,9 +22,10 @@ class Years extends Component {
       window.clearTimeout(scrollTO);
       scrollTO = null;
     }
+
     this.setState({
       ...this.state,
-      scrollDate: null
+      scrollDate: null,
     });
     this.props.onScroll(
       moment(this.props.scrollDate)
@@ -35,7 +34,7 @@ class Years extends Component {
   }
 
   render() {
-    let date = moment(this.state.scrollDate || this.props.scrollDate);
+    const date = moment(this.state.scrollDate || this.props.scrollDate);
     const yearStart = date.clone().startOf('year');
     let year = yearStart
       .clone()
@@ -47,7 +46,6 @@ class Years extends Component {
         .add(1, 'year');
       years.push(year);
     }
-    console.log(years.map(y => y.format()))
 
     const pxToDate = linear(0, years[0], yearLength / yearHeight);
 
@@ -56,18 +54,19 @@ class Years extends Component {
         className={s.years}
         onWheel={e => {
           e.preventDefault();
-          const scrollDate = linear(0, date , yearLength / yearHeight)
-              .Y(e.deltaY);
+          const scrollDate = linear(0, date, yearLength / yearHeight)
+              .y(e.deltaY);
           this.setState({
             ...this.state,
-            scrollDate
+            scrollDate,
           });
           if (scrollTO) window.clearTimeout(scrollTO);
           scrollTO = window.setTimeout(() => this.setYear(scrollDate), 100);
         }}
+
         style={{
           transition: this.stoppedScrolling ? 'top .2s ease-out 0s' : 'none',
-          top: Math.floor(calHeight / 2 - pxToDate.X(date))
+          top: Math.floor(calHeight / 2 - pxToDate.x(date)),
         }}
       >
         {years.map(year => (
@@ -85,9 +84,9 @@ class Years extends Component {
         ))}
         {['currentRange', 'activeRange'].map(name => {
           const range = this.props[name];
-          if (!range) return;
-          const [top, bottom] = range.map(date => Math.floor(pxToDate.X(date)));
-          if (bottom - top <= 2) return;
+          if (!range) return null;
+          const [top, bottom] = range.map(date => Math.floor(pxToDate.x(date)));
+          if (bottom - top <= 2) return null;
           return (
             <div
               key={name}
@@ -96,11 +95,11 @@ class Years extends Component {
                 s[name]
               )}
               style={{
-                top : top - 1,
-                height: bottom - top + 2
+                top: top - 1,
+                height: bottom - top + 2,
               }}
             />
-          )
+          );
         })}
       </div>
     );

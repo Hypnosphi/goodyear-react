@@ -1,7 +1,7 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import Calendar from './Calendar';
 import Input from './Input';
-import {formats} from './consts';
+import formats from './formats.json';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
 import moment from 'moment';
@@ -14,9 +14,9 @@ function sameDay(next, prev) {
   const prevMoment = moment(prev);
   if (nextMoment.isValid() && prevMoment.isValid()) {
     return nextMoment.isSame(prevMoment, 'day');
-  } else {
-    return next === prev;
   }
+
+  return next === prev;
 }
 
 class Goodyear extends Component {
@@ -28,13 +28,13 @@ class Goodyear extends Component {
         text: '',
         hoverDate: null,
         scrollDate: null,
-        active: null
+        active: null,
       },
       onOuterClick: e => {
         if (!this.refs.root.contains(e.target)) {
           this.set('active', null);
         }
-      }
+      },
     });
   }
 
@@ -48,12 +48,15 @@ class Goodyear extends Component {
         window.removeEventListener('focusin', this.onOuterClick);
       }
 
-      this.state.text && prevState.active && this.confirm(prevState.active);
+      if (this.state.text && prevState.active) {
+        this.confirm(prevState.active);
+      }
+
       this.set('text', '');
     }
 
     const name = this.state.active;
-    if (this.props[name] && !sameDay(this.props[name], prevProps[name])){
+    if (this.props[name] && !sameDay(this.props[name], prevProps[name])) {
       this.set('text', '');
     }
   }
@@ -65,57 +68,59 @@ class Goodyear extends Component {
     } else {
       extension[key] = value;
     }
+
     this.setState({
       ...this.state,
-      ...extension
-    })
+      ...extension,
+    });
   }
 
   select(changes) {
     if (!this.props.range) {
       this.set({
         active: null,
-        text: ''
+        text: '',
       });
-      return this.props.onChange(changes.date);
-    }
+      this.props.onChange(changes.date);
+    } else {
+      let { from, to } = {
+        ...this.props,
+        ...changes,
+      };
 
-    let {from, to} = {
-      ...this.props,
-      ...changes
-    };
+      // proceed to setting the end by default
+      let active = 'to';
 
-    // proceed to setting the end by default
-    let active = 'to';
+      // end is before beginning
+      if (from && to && from.isAfter(to, 'days')) {
+        // ignore the old end when beginning is changed
+        if (changes.from) {
+          to = null;
 
-    // end is before beginning
-    if (from && to && from.isAfter(to, 'days')) {
-      // ignore the old end when beginning is changed
-      if (changes.from) {
-        to = null;
-      // treat range as reverse when end is changed
+        // treat range as reverse when end is changed
+        } else if (changes.to) {
+          to = from;
+          from = changes.to;
+        }
       } else if (changes.to) {
-        to = from;
-        from = changes.to;
+        // proceed to setting the beginning if it's absent, otherwise we're done
+        active = from ? null : 'from';
       }
-    } else if (changes.to) {
-      // proceed to setting the beginning if it's absent, otherwise we're done
-      active = from ? null : 'from';
-    }
 
-    this.set({
-      active,
-      hoverDate: null,
-      text: ''
-    });
-    this.props.onChange({from, to});
+      this.set({
+        active,
+        hoverDate: null,
+        text: '',
+      });
+      this.props.onChange({ from, to });
+    }
   }
 
   parseDate(text) {
     if (!(text in this.parsed)) {
       const extendedFormats = [
         this.props.format,
-        ...formats
+        ...formats,
       ];
       const date = moment(text, extendedFormats);
       this.parsed[text] = date.isValid() ? date : null;
@@ -126,7 +131,7 @@ class Goodyear extends Component {
 
   confirm(name) {
     this.select({
-      [name]: this.parseDate(this.state.text) || this.props[name]
+      [name]: this.parseDate(this.state.text) || this.props[name],
     });
   }
 
@@ -134,7 +139,7 @@ class Goodyear extends Component {
     const names = this.props.range ? ['from', 'to'] : ['date'];
     const dates = names.reduce((obj, key) => {
       const date = this.parseDate(this.props[key]);
-      return {...obj, [key]: date};
+      return { ...obj, [key]: date };
     }, {});
     return (
       <div
@@ -152,9 +157,10 @@ class Goodyear extends Component {
             onInput={text => {
               this.set({
                 text,
-                scrollDate: this.parseDate(text) || this.state.scrollDate
-              })
+                scrollDate: this.parseDate(text) || this.state.scrollDate,
+              });
             }}
+
             onConfirm={() => this.confirm(name)}
           />
         ))}
@@ -163,9 +169,9 @@ class Goodyear extends Component {
           {...this.state}
           scrollDate={this.state.scrollDate || dates[this.state.active] || moment()}
           activeDate={this.state.hoverDate || this.state.text && this.parseDate(this.state.text)}
-          onScroll={scrollDate => this.set({scrollDate})}
+          onScroll={scrollDate => this.set({ scrollDate })}
           onHover={date => this.set('hoverDate', date)}
-          onSelect={date => this.select({[this.state.active]: date})}
+          onSelect={date => this.select({ [this.state.active]: date })}
         />
       </div>
     );
@@ -178,7 +184,7 @@ Goodyear.defaultProps = {
   from: null,
   to: null,
   format: 'D MMMM YYYY г.',
-  onChange: Function.prototype // noop function
+  onChange: Function.prototype, // noop function
 };
 
 export default withStyles(s)(Goodyear);

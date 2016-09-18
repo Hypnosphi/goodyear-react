@@ -10,17 +10,10 @@
 import 'babel-polyfill';
 import path from 'path';
 import express from 'express';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import expressJwt from 'express-jwt';
-import expressGraphQL from 'express-graphql';
-import jwt from 'jsonwebtoken';
 import PrettyError from 'pretty-error';
-import passport from './core/passport';
-import schema from './data/schema';
 import render from './render';
-import { port, auth } from './config';
 
+const port = process.env.PORT || 3000;
 const server = global.server = express();
 
 //
@@ -34,51 +27,13 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 server.use(express.static(path.join(__dirname, 'public')));
-server.use(cookieParser());
-server.use(bodyParser.urlencoded({ extended: true }));
-server.use(bodyParser.json());
-
-//
-// Authentication
-// -----------------------------------------------------------------------------
-server.use(expressJwt({
-  secret: auth.jwt.secret,
-  credentialsRequired: false,
-  /* jscs:disable requireCamelCaseOrUpperCaseIdentifiers */
-  getToken: req => req.cookies.id_token,
-  /* jscs:enable requireCamelCaseOrUpperCaseIdentifiers */
-}));
-server.use(passport.initialize());
-
-server.get('/login/facebook',
-  passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false })
-);
-server.get('/login/facebook/return',
-  passport.authenticate('facebook', { failureRedirect: '/login', session: false }),
-  (req, res) => {
-    const expiresIn = 60 * 60 * 24 * 180; // 180 days
-    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
-    res.redirect('/');
-  }
-);
-
-//
-// Register API middleware
-// -----------------------------------------------------------------------------
-server.use('/graphql', expressGraphQL(req => ({
-  schema,
-  graphiql: true,
-  rootValue: { request: req },
-  pretty: process.env.NODE_ENV !== 'production',
-})));
 
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
 server.get('*', async (req, res, next) => {
   try {
-    const {statusCode, html} = await render(req);
+    const { statusCode, html } = await render(req);
     res.status(statusCode);
     res.send(html);
   } catch (err) {
