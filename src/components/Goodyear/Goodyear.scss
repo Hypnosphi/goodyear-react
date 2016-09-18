@@ -3,307 +3,313 @@ $cellHeight: 20px;
 $yearHeight: 32px;
 $padding: 5px;
 $radius: 3px;
-
 $color-text: #333;
 $color-red: #c73d05;
 $color-current: #bbdcfd;
-$color-hover: #FBEBBB;
-$color-hover-weekend: #FFDBBB;
+$color-hover: #fbebbb;
+$color-hover-weekend: #ffdbbb;
 $color-border: #e5e5e5;
 $color-shadow: #666;
 $color-year: #c3b5b4;
 
 %hoverable {
-  cursor: pointer;
   color: $color-text;
+  cursor: pointer;
   transition: color .2s ease-out 0s;
   &:hover {
-    transition: none;
     color: $color-red;
+    transition: none;
   }
 }
 
-.goodyear{
-  color: $color-text;
+.goodyear {
   position: relative;
   display: inline-block;
+  color: $color-text;
   * {
     box-sizing: border-box;
   }
 }
 
-.inputContainer{
+.inputContainer {
+  position: relative;
   display: inline-block;
   width: 180px;
-  position: relative;
 
-  &:not(:first-child){
+  &:not(:first-child) {
     margin-left: 30px;
-    &::before{
+    &::before {
       position: absolute;
       top: 0;
       left: -22px;
-      content: '➔';
-      line-height: 24px;
       font-size: 16px;
+      line-height: 24px;
       color: $color-shadow;
+      content: '➔';
     }
   }
 }
 
-.input{
-  outline: none;
-  border: 1px solid $color-border;
+.input {
+  width: 100%;
+  padding: 2px $padding;
   font-size: 14px;
   line-height: $cellHeight;
-  padding: 2px $padding;
-  width: 100%;
+  border: 1px solid $color-border;
+  outline: none;
 
-  &:hover{
+  &:hover {
     border-color: color($color-border l(-10%));
   }
 
   &:focus,
-  &.focus{
+  &.focus {
     border-color: $color-current;
     box-shadow: inset 0 0 0 1px $color-current;
   }
 }
 
-.icon{
-  @extend %hoverable;
+.icon {
   position: absolute;
-  right: 5px;
   top: 2px;
+  right: 5px;
+
+  @extend %hoverable;
   &::before {
-    line-height: $cellHeight;
     font-size: 16px;
+    line-height: $cellHeight;
   }
 }
 
-.calendar{
+.calendar {
+  position: absolute;
+  top: 31px;
+  left: -1px;
+  z-index: 100;
   width: 320px;
   height: 270px;
   overflow: hidden;
-  position: absolute;
-  z-index: 100;
-  top: 31px;
-  left: -1px;
-  background-color: #fff;
-  box-shadow: 0 8px 20px -8px $color-shadow;
-  border-radius: 2px;
-  border: 1px solid $color-border;
   font-size: 13px;
   user-select: none;
+  background-color: #fff;
+  border: 1px solid $color-border;
+  border-radius: 2px;
+  box-shadow: 0 8px 20px -8px $color-shadow;
 }
 
-.days{
+.days {
   position: absolute;
   left: 3px;
 }
 
-.weekdays{
+.weekdays {
   position: absolute;
-  z-index: 1;
-  height: $cellHeight;
-  width: 256px;
-  border-bottom: 1px solid #e5e5e5;
-  line-height: 17px;
   top: 0;
   left: 0;
+  z-index: 1;
+  width: 256px;
+  height: $cellHeight;
   padding-left: 8px;
   font-size: 12px;
+  line-height: 17px;
   background: rgba(255, 255, 255, .8);
-
+  border-bottom: 1px solid #e5e5e5;
   // Bonus track for people from future and Safari lovers
+
   backdrop-filter: blur(2px);
 }
 
-.weekday{
+.weekday {
+  display: inline-block;
   width: $cellWidth;
   padding: 2px $padding 0;
   text-transform: capitalize;
-  display: inline-block;
 }
 
 .weekend {
   color: $color-red;
 }
 
-.month{
-  line-height: $cellHeight;
+.month {
   display: flex;
-  flex-wrap: wrap;
   width: calc($cellWidth * 7);
   margin: calc($cellHeight / 2) $padding;
+  line-height: $cellHeight;
 
-  &>*{
-    padding: 0 $padding;
+  flex-wrap: wrap;
+
+  & > * {
     height: $cellHeight;
+    padding: 0 $padding;
+
     flex-shrink: 0;
   }
 }
 
-.monthTitle{
-  flex-basis: calc($cellWidth * 3);
+.monthTitle {
   text-transform: capitalize;
+
+  flex-basis: calc($cellWidth * 3);
 }
 
-.day{
-  text-align: right;
-  flex-basis: $cellWidth;
-  transition: background-color .2s ease-out 0s;
-  cursor: pointer;
+.day {
   position: relative;
+  text-align: right;
+  cursor: pointer;
   border-radius: $radius;
+  transition: background-color .2s ease-out 0s;
+
+  flex-basis: $cellWidth;
 
 
 
-  &.between{
+  &.between {
+    background-color: color($color-current l(+10%));
     border-radius: 0;
     transition: none;
-    background-color: color($color-current l(+10%));
   }
 
-  &.activeBetween{
+  &.activeBetween {
+    background-color: color($color-hover l(+5%));
     border-radius: 0;
     transition: none;
-    background-color: color($color-hover l(+5%));
 
-    &.weekend{
+    &.weekend {
       background-color: color($color-hover-weekend l(+5%));
     }
   }
 
-  &.current{
-    transition: none;
-    background-color: $color-current;
+  &.current {
     font-weight: bold;
     color: $color-text;
+    background-color: $color-current;
+    transition: none;
   }
 
-  &.active{
-    transition: none;
+  &.active {
     background-color: $color-hover;
+    transition: none;
 
-    &.weekend{
+    &.weekend {
       background-color: $color-hover-weekend;
     }
   }
 
-  &.from{
+  &.from {
     border-radius: $radius 0 0 $radius;
   }
 
-  &.to{
+  &.to {
     border-radius: 0 $radius $radius 0;
   }
 
-  &.from.to{
+  &.from.to {
     border-radius: $radius;
   }
 
-  &.empty{
+  &.empty {
     pointer-events: none;
     opacity: 0;
   }
 
-  &.today::after{
+  &.today::after {
     position: absolute;
-    left: 0;
     top: 9px;
-    text-align: center;
+    left: 0;
     width: 100%;
+    text-align: center;
   }
 }
 
-.monthNames{
-  height: calc(12 * $cellHeight);
-  left: 195px;
+.monthNames {
   position: absolute;
   top: $cellHeight;
+  left: 195px;
   width: 55px;
+  height: calc(12 * $cellHeight);
   padding: 0 $padding;
   overflow: hidden;
 }
 
-.monthName{
-  @extend %hoverable;
+.monthName {
   height: $cellHeight;
   line-height: $cellHeight;
+
+  @extend %hoverable;
 }
 
-.today::after{
-  content: ' •';
+.today::after {
   font-weight: bold;
+  content: ' •';
 }
 
-.slider{
+.slider {
   position: absolute;
-  cursor: grab;
-  z-index: 1;
-  left: 0;
   right: 0;
+  left: 0;
+  z-index: 1;
   height: calc(2 * $cellHeight);
+  cursor: grab;
   background-color: #000;
-  opacity: 0.1;
   border-radius: $radius;
-  &:hover{
-    opacity: 0.15;
+  opacity: .1;
+  &:hover {
+    opacity: .15;
   }
 
-  &.dragging{
+  &.dragging {
     cursor: grabbing;
-    opacity: 0.25;
+    opacity: .25;
   }
 }
 
-.years{
+.years {
   position: absolute;
-  height: calc($yearHeight * 11);
   top: 0;
   left: 256px;
   width: 61px;
+  height: calc($yearHeight * 11);
   border-left: 1px solid $color-border;
 }
 
-.year{
-  @extend %hoverable;
+.year {
   height: $yearHeight;
+  padding-left: 12px;
   line-height: $yearHeight;
   color: $color-year;
-  padding-left: 12px;
 
-  &.currentYear{
+  @extend %hoverable;
+
+  &.currentYear {
+    color: $color-text;
     cursor: auto;
     transition: none;
-    color: $color-text;
   }
 }
 
-.marker{
+.marker {
   position: absolute;
   top: 135px;
   left: 256px;
   width: 61px;
-  height: 0px;
+  height: 0;
   border-bottom: 1px solid $color-year;
 }
 
-.range{
+.range {
   position: absolute;
-  left: 0;
   right: 0;
+  left: 0;
+  pointer-events: none;
   border-top: 2px solid black;
   border-bottom: 2px solid black;
-  pointer-events: none;
 
-  &.currentRange{
+  &.currentRange {
     background-color: color($color-current a(30%));
     border-color: $color-current;
   }
 
-  &.activeRange{
+  &.activeRange {
     background-color: color($color-hover a(30%));
     border-color: $color-hover;
   }

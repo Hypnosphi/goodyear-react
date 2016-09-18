@@ -10,6 +10,7 @@
 import path from 'path';
 import cp from 'child_process';
 import webpackConfig from './webpack.config';
+import moment from 'moment';
 
 // Should match the text string used in `src/server.js/server.listen(...)`
 const RUNNING_REGEXP = /The server is running at http:\/\/(.*?)\//;
@@ -21,10 +22,10 @@ const serverPath = path.join(output.path, output.filename);
 // Launch or restart the Node.js server
 function runServer(cb) {
   function onStdOut(data) {
-    const time = new Date().toTimeString();
+    const time = moment();
     const match = data.toString('utf8').match(RUNNING_REGEXP);
 
-    process.stdout.write(time.replace(/.*(\d{2}:\d{2}:\d{2}).*/, '[$1] '));
+    process.stdout.write(time.format('HH:mm:ss'));
     process.stdout.write(data);
 
     if (match) {

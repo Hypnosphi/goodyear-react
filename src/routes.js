@@ -15,9 +15,7 @@ import NotFoundPage from './components/NotFoundPage';
 import ErrorPage from './components/ErrorPage';
 
 const router = new Router(on => {
-  on('*', async (state) => {
-    return <App context={state.context}><ContentPage /></App>;
-  });
+  on('*', (state) => <App context={state.context}><ContentPage /></App>);
 
   on('error', (state, error) => state.statusCode === 404 ?
     <App context={state.context} error={error}><NotFoundPage /></App> :

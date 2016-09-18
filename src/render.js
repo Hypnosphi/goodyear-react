@@ -11,7 +11,7 @@ async function render(req = {}) {
     description: '',
     css: '',
     body: '',
-    entry: assets.main.js
+    entry: assets.main.js,
   };
 
   const css = [];
@@ -27,14 +27,12 @@ async function render(req = {}) {
     data.css = css.join('');
   });
 
-  return {statusCode, html: template(data)};
+  return { statusCode, html: template(data) };
 }
 
-render().then(({html}) => fs.writeFile(
+render().then(({ html }) => fs.writeFile(
   'index.html',
   html
 ));
 
 export default render;
-
-

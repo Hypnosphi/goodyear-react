@@ -85,9 +85,6 @@ const config = {
         test: /\.json$/,
         loader: 'json-loader',
       }, {
-        test: /\.txt$/,
-        loader: 'raw-loader',
-      }, {
         test: /\.(png|jpg|jpeg|gif|svg|wav|mp3|woff|woff2|eot|ttf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader?name=resources/[name].[ext]',
       }, {

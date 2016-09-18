@@ -7,6 +7,9 @@
   "rules": {
     "no-confusing-arrow": 0,
     "react/jsx-quotes": 0,
+    "react/prop-types": 0,
+    "react/jsx-no-bind": 0,
+    "no-shadow": 0,
     "jsx-quotes": [2, "prefer-double"]
   }
 }

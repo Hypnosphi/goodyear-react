@@ -7,7 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ContentPage.scss';
 import MarkdownIt from 'markdown-it';
@@ -21,62 +21,75 @@ const md = new MarkdownIt({
   highlight(str, lang) {
     if (lang && Prism.languages[lang]) {
       try {
-        return Prism.highlight(str, Prism.languages[lang]);
-      } catch (e) {}
+        const text = Prism.highlight(str, Prism.languages[lang]);
+        const attrs = `class="language-${lang}"`;
+        return `<pre ${attrs}><code ${attrs}>${text}</code></pre>`;
+      } catch (e) {
+        // empty
+      }
     }
 
-    return '';
-  }
+    return `<pre><code>${md.utils.escapeHtml(str)}</code></pre>`;
+  },
 });
 
-function Markup({text}) {
-  return <div dangerouslySetInnerHTML={{ __html: md.render(text) }}/>;
+function Markup({ text }) {
+  return <div dangerouslySetInnerHTML={{ __html: md.render(text) }} />;
 }
 
 class ContentPage extends Component {
   constructor(...args) {
     super(...args);
-    this.state = {}
+    this.state = {};
   }
 
   render() {
     return (
       <div className={s.root}>
+        <a
+          className={s.github}
+          href="https://github.com/hypnosphi/goodyear-react/"
+          target="_blanc"
+        >GitHub</a>
         <h2>Одна дата</h2>
         <div key="single">
           <Goodyear
             date={this.state.date}
-            onChange={date => this.setState({...this.state, date})}
+            onChange={date => this.setState({ ...this.state, date })}
           />
         </div>
-        <Markup text={`
+        <Markup
+          text={`
 \`\`\`jsx
 <Goodyear
   date={this.state.date}
   onChange={date => this.setState({...this.state, date})}
 />
 \`\`\`
-          `}/>
-        <br/>
+          `}
+        />
+        <br />
         <h2>Диапазон дат</h2>
         <div>
           <Goodyear
-            range={true}
+            range
             from={this.state.from}
             to={this.state.to}
-            onChange={({from, to}) => this.setState({...this.state, from, to})}
+            onChange={({ from, to }) => this.setState({ ...this.state, from, to })}
           />
         </div>
-        <Markup text={`
+        <Markup
+          text={`
 \`\`\`jsx
 <Goodyear
-  range={true}
+  range
   from={this.state.from}
   to={this.state.to}
   onChange={({from, to}) => this.setState({...this.state, from, to})}
 />
 \`\`\`
-          `}/>
+          `}
+        />
       </div>
     );
   }

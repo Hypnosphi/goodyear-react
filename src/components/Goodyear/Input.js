@@ -1,11 +1,10 @@
-import React, { Component, PropTypes } from 'react';
+import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
 import cx from 'classnames';
-import moment from 'moment';
 import fa from 'isomorphic-style!css!font-awesome/css/font-awesome.css';
 
-function Input ({
+function Input({
   active,
   text,
   hoverDate,
@@ -13,7 +12,7 @@ function Input ({
   format,
   onInput,
   onActivate,
-  onConfirm
+  onConfirm,
 }) {
   return (
     <div className={s.inputContainer}>
@@ -32,8 +31,8 @@ function Input ({
       <i
         className={cx(
               s.icon,
-              "fa",
-              "fa-calendar"
+              'fa',
+              'fa-calendar'
             )}
         onClick={onActivate}
       />
