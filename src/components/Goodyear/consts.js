@@ -16,3 +16,18 @@ export function linear(x0, y0, a) {
     },
   };
 }
+
+export function scheduleRAF() {
+  let scheduledCb;
+  let RAF;
+  return function schedule(cb) {
+    scheduledCb = cb;
+    if (!RAF) {
+      RAF = window.requestAnimationFrame(() => {
+        scheduledCb();
+        RAF = null;
+        scheduledCb = null;
+      });
+    }
+  };
+}
