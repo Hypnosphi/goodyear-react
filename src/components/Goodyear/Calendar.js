@@ -2,7 +2,7 @@ import React from 'react';
 import Month from './Month';
 import MonthNames from './MonthNames';
 import Years from './Years';
-import { cellHeight, calHeight, linear } from './consts';
+import { cellHeight, calHeight, linear, scheduleRAF } from './consts';
 import moment from 'moment';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Goodyear.scss';
@@ -45,6 +45,8 @@ function Weekdays() {
   );
 }
 
+const scrollSchedule = scheduleRAF();
+let dy = 0;
 function Months(props) {
   const scrollDate = moment(props.scrollDate);
   const monthStart = scrollDate.clone().startOf('month');
@@ -70,19 +72,22 @@ function Months(props) {
       className={s.months}
       onWheel={e => {
         e.preventDefault();
-        const dy = e.deltaY;
-        let date;
+        dy += e.deltaY;
+        scrollSchedule(() => {
+          let date;
 
-        // adjust scroll speed to prevent glitches
-        if (dy < offset) {
-          date = pxToDate.y(offset) + (dy - offset) * monthSpeed(months[1]);
-        } else if (dy > bottomOffset) {
-          date = pxToDate.y(bottomOffset) + (dy - bottomOffset) * monthSpeed(months[3]);
-        } else {
-          date = pxToDate.y(dy);
-        }
+          // adjust scroll speed to prevent glitches
+          if (dy < offset) {
+            date = pxToDate.y(offset) + (dy - offset) * monthSpeed(months[1]);
+          } else if (dy > bottomOffset) {
+            date = pxToDate.y(bottomOffset) + (dy - bottomOffset) * monthSpeed(months[3]);
+          } else {
+            date = pxToDate.y(dy);
+          }
 
-        props.onScroll(date);
+          props.onScroll(date);
+          dy = 0;
+        });
       }}
     >
       <Weekdays />
